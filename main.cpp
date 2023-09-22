@@ -51,8 +51,8 @@ public:
 
 		// Loading JPG file
 		FIBITMAP* bitmap = FreeImage_Load(
-			FreeImage_GetFileType("./Mallas/bola.jpg", 0),
-			"./Mallas/bola.jpg");  //*** Para Textura: esta es la ruta en donde se encuentra la textura
+			FreeImage_GetFileType("./Mallas/boat.png", 0),
+			"./Mallas/boat.png");  //*** Para Textura: esta es la ruta en donde se encuentra la textura
 
 		FIBITMAP* pImage = FreeImage_ConvertTo32Bits(bitmap);
 		int nWidth = FreeImage_GetWidth(pImage);
@@ -76,14 +76,15 @@ public:
       glPushMatrix();
 	  glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f);
 
-      if (shader) shader->begin();
+      if (shader1) shader1->begin();
 		  
 		  glPushMatrix();
 		  glTranslatef(-1.5f, 0.0f, 0.0f);
-		  glmDraw(objmodel_ptr, GLM_SMOOTH | GLM_MATERIAL);
+		  glBindTexture(GL_TEXTURE_2D, texid);
+		  glmDraw(objmodel_ptr, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
 	      //glutSolidTeapot(1.0);
-      if (shader) shader->end();
+      if (shader1) shader1->end();
 
 	  //*** Para Textura: llamado al shader para objetos texturizados
 	  if (shader1) shader1->begin();
@@ -141,7 +142,7 @@ public:
 
 	  if (!objmodel_ptr)
 	  {
-		  objmodel_ptr = glmReadOBJ("./Mallas/bunny.obj");
+		  objmodel_ptr = glmReadOBJ("./Mallas/boat.obj");
 		  if (!objmodel_ptr)
 			  exit(0);
 
@@ -156,7 +157,7 @@ public:
 
 	  if (!objmodel_ptr1)
 	  {
-		  objmodel_ptr1 = glmReadOBJ("./Mallas/bola.obj");
+		  objmodel_ptr1 = glmReadOBJ("./Mallas/boat.obj");
 		  if (!objmodel_ptr1)
 			  exit(0);
 
