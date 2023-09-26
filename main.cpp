@@ -27,8 +27,8 @@ protected:
    bool bUp;        // flag if counting up or down.
    GLMmodel* objmodel_ptr;
    GLMmodel* objmodel_ptr1; //*** Para Textura: variable para objeto texturizado
-   GLuint texid; //*** Para Textura: variable que almacena el identificador de textura
-
+   GLuint grayTexture; //*** Para Textura: variable que almacena el identificador de textura
+   GLuint ballTexture;
 
 public:
 	myWindow(){}
@@ -36,23 +36,23 @@ public:
 	//*** Para Textura: aqui adiciono un método que abre la textura en JPG
 	void initialize_textures(void)
 	{
+		initialize_texture("./Mallas/boat.png");
+	}
+
+	GLuint initialize_texture(const char* texPath) {
 		int w, h;
 		GLubyte* data = 0;
-		//data = glmReadPPM("soccer_ball_diffuse.ppm", &w, &h);
-		//std::cout << "Read soccer_ball_diffuse.ppm, width = " << w << ", height = " << h << std::endl;
+		GLuint texId;
 
-		//dib1 = loadImage("soccer_ball_diffuse.jpg"); //FreeImage
-
-		glGenTextures(1, &texid);
-		glBindTexture(GL_TEXTURE_2D, texid);
+		glGenTextures(1, &texId);
+		glBindTexture(GL_TEXTURE_2D, texId);
 		glTexEnvi(GL_TEXTURE_2D, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		// Loading JPG file
 		FIBITMAP* bitmap = FreeImage_Load(
-			FreeImage_GetFileType("./Mallas/boat.png", 0),
-			"./Mallas/boat.png");  //*** Para Textura: esta es la ruta en donde se encuentra la textura
+			FreeImage_GetFileType(texPath, 0),
+			texPath);  //*** Para Textura: esta es la ruta en donde se encuentra la textura
 
 		FIBITMAP* pImage = FreeImage_ConvertTo32Bits(bitmap);
 		int nWidth = FreeImage_GetWidth(pImage);
@@ -62,9 +62,12 @@ public:
 			0, GL_BGRA, GL_UNSIGNED_BYTE, (void*)FreeImage_GetBits(pImage));
 
 		FreeImage_Unload(pImage);
-		//
+
 		glEnable(GL_TEXTURE_2D);
+
+		return texId;
 	}
+
 
 
 	virtual void OnRender(void)
@@ -74,13 +77,13 @@ public:
       //timer010 = 0.09; //for screenshot!
 
       glPushMatrix();
-	  //glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f);
+	  glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f);
 
       if (shader1) shader1->begin();
 		  
 		  glPushMatrix();
 		  glTranslatef(-1.5f, 0.0f, 0.0f);
-		  glBindTexture(GL_TEXTURE_2D, texid);
+		  glBindTexture(GL_TEXTURE_2D, grayTexture);
 		  glmDraw(objmodel_ptr, GLM_SMOOTH  | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
 	      //glutSolidTeapot(1.0);
@@ -91,7 +94,7 @@ public:
 
 		  glPushMatrix();
 		  glTranslatef(1.5f, 0.0f, 0.0f);
-		  glBindTexture(GL_TEXTURE_2D, texid);
+		  glBindTexture(GL_TEXTURE_2D, ballTexture);
 		  glmDraw(objmodel_ptr1, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
 	  //glutSolidTeapot(1.0);
@@ -142,7 +145,7 @@ public:
 
 	  if (!objmodel_ptr)
 	  {
-		  objmodel_ptr = glmReadOBJ("./Mallas/boat.obj");
+		  objmodel_ptr = glmReadOBJ("./Mallas/Umbrella.obj");
 		  if (!objmodel_ptr)
 			  exit(0);
 
@@ -167,7 +170,9 @@ public:
 	  }
  
 	  //*** Para Textura: abrir archivo de textura
-	  initialize_textures();
+	  //initialize_textures();
+	  grayTexture = initialize_texture("./Mallas/boat.png");
+	  ballTexture = initialize_texture("./Mallas/bola.jpg");
       DemoLight();
 
 	}
