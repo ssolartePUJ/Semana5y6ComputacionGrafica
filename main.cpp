@@ -74,14 +74,14 @@ public:
       //timer010 = 0.09; //for screenshot!
 
       glPushMatrix();
-	  glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f);
+	  //glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f);
 
       if (shader1) shader1->begin();
 		  
 		  glPushMatrix();
 		  glTranslatef(-1.5f, 0.0f, 0.0f);
 		  glBindTexture(GL_TEXTURE_2D, texid);
-		  glmDraw(objmodel_ptr, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
+		  glmDraw(objmodel_ptr, GLM_SMOOTH  | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
 	      //glutSolidTeapot(1.0);
       if (shader1) shader1->end();
