@@ -25,10 +25,13 @@ protected:
    clock_t time0,time1;
    float timer010;  // timer counting 0->1->0
    bool bUp;        // flag if counting up or down.
-   GLMmodel* objmodel_ptr;
-   GLMmodel* objmodel_ptr1; //*** Para Textura: variable para objeto texturizado
+   GLMmodel* islandPtr;
+   GLMmodel* umbrellaPtr; //*** Para Textura: variable para objeto texturizado
+   GLMmodel* boatPtr;
+   GLMmodel* discoPtr;
    GLuint grayTexture; //*** Para Textura: variable que almacena el identificador de textura
    GLuint ballTexture;
+   GLuint islandTexture;
 
 public:
 	myWindow(){}
@@ -36,7 +39,7 @@ public:
 	//*** Para Textura: aqui adiciono un método que abre la textura en JPG
 	void initialize_textures(void)
 	{
-		initialize_texture("./Mallas/boat.png");
+		ballTexture = initialize_texture("./Mallas/boat.png");
 	}
 
 	GLuint initialize_texture(const char* texPath) {
@@ -69,7 +72,6 @@ public:
 	}
 
 
-
 	virtual void OnRender(void)
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -77,29 +79,65 @@ public:
       //timer010 = 0.09; //for screenshot!
 
       glPushMatrix();
-	  glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f);
+	  glRotatef(timer010 * 360, 0.5, 1.0f, 0.1f); // Rotation View
 
+	  //glRotatef(90, 1, 0.0f, 0.0f); //Topdown View
+	  //glTranslatef(0.0f, 2.0f, 0.0f);
+
+
+	  /*
       if (shader1) shader1->begin();
 		  
 		  glPushMatrix();
 		  glTranslatef(-1.5f, 0.0f, 0.0f);
 		  glBindTexture(GL_TEXTURE_2D, grayTexture);
-		  glmDraw(objmodel_ptr, GLM_SMOOTH  | GLM_MATERIAL | GLM_TEXTURE);
+		  glmDraw(islandPtr, GLM_SMOOTH  | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
 	      //glutSolidTeapot(1.0);
       if (shader1) shader1->end();
 
 	  //*** Para Textura: llamado al shader para objetos texturizados
 	  if (shader1) shader1->begin();
-
 		  glPushMatrix();
 		  glTranslatef(1.5f, 0.0f, 0.0f);
 		  glBindTexture(GL_TEXTURE_2D, ballTexture);
-		  glmDraw(objmodel_ptr1, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
+		  glmDraw(islandPtr, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
 		  glPopMatrix();
-	  //glutSolidTeapot(1.0);
 	  if (shader1) shader1->end();
 
+	  */
+
+	  if (shader) shader->begin();
+		  glPushMatrix();
+		  glTranslatef(0.0f, 0.0f, 0.0f);
+		  glmDraw(islandPtr, GLM_SMOOTH | GLM_MATERIAL);
+		  glPopMatrix();
+	  if (shader) shader->end();
+
+	  if (shader) shader->begin();
+		  glPushMatrix();
+		  glTranslatef(0.3f, 0.0f, 0.0f);
+		  glScalef(0.1f, 0.1f, 0.1f);
+		  glmDraw(umbrellaPtr, GLM_SMOOTH | GLM_MATERIAL);
+		  glPopMatrix();
+	  if (shader) shader->end();
+
+	  if (shader) shader->begin();
+		  glPushMatrix();
+		  glTranslatef(-0.15f, 0.0f, 0.15f);
+		  glScalef(0.1f, 0.1f, 0.1f);
+		  glmDraw(discoPtr, GLM_SMOOTH | GLM_MATERIAL);
+		  glPopMatrix();
+	  if (shader) shader->end();
+
+	  if (shader1) shader1->begin();
+		  glPushMatrix();
+		  glTranslatef(0.6f, -0.1f, 0.0f);
+		  glScalef(0.2f, 0.2f, 0.2f);
+		  glBindTexture(GL_TEXTURE_2D, grayTexture);
+		  glmDraw(boatPtr, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
+		  glPopMatrix();
+	  if (shader1) shader1->end();
 
       glutSwapBuffers();
       glPopMatrix();
@@ -118,6 +156,7 @@ public:
 		glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
 		glShadeModel(GL_SMOOTH);
 		glEnable(GL_DEPTH_TEST);
+
 
 		shader = SM.loadfromFile("vertexshader.txt","fragmentshader.txt"); // load (and compile, link) from file
 		if (shader==0) 
@@ -141,41 +180,48 @@ public:
       bUp = true;
 
 	  //Abrir mallas
-	  objmodel_ptr = NULL;
-
-	  if (!objmodel_ptr)
-	  {
-		  objmodel_ptr = glmReadOBJ("./Mallas/Umbrella.obj");
-		  if (!objmodel_ptr)
-			  exit(0);
-
-		  glmUnitize(objmodel_ptr);
-		  glmFacetNormals(objmodel_ptr);
-		  glmVertexNormals(objmodel_ptr, 90.0);
-	  }
 
 
-	  //*** Para Textura: abrir malla de objeto a texturizar
-	  objmodel_ptr1 = NULL;
+	  umbrellaPtr = initializeObject(umbrellaPtr , "./Mallas/umbrella.obj"); // Objeto de tribu
+	  
+	  islandPtr = initializeObject(islandPtr , "./Mallas/islandLegacy.obj"); //Objeto natural
 
-	  if (!objmodel_ptr1)
-	  {
-		  objmodel_ptr1 = glmReadOBJ("./Mallas/boat.obj");
-		  if (!objmodel_ptr1)
-			  exit(0);
+	  boatPtr = initializeObject(boatPtr, "./Mallas/boat.obj"); //Objeto Texturado
 
-		  glmUnitize(objmodel_ptr1);
-		  glmFacetNormals(objmodel_ptr1);
-		  glmVertexNormals(objmodel_ptr1, 90.0);
-	  }
+	  discoPtr = initializeObject(boatPtr, "./Mallas/disco.obj"); // Objeto Artificial
+
+
+	   
+	 //
+
  
 	  //*** Para Textura: abrir archivo de textura
-	  //initialize_textures();
 	  grayTexture = initialize_texture("./Mallas/boat.png");
 	  ballTexture = initialize_texture("./Mallas/bola.jpg");
+	  islandTexture = initialize_texture("./Mallas/island.jpg");
       DemoLight();
-
 	}
+
+	GLMmodel* initializeObject(GLMmodel* objectPtr, char* path) {
+
+		objectPtr = NULL;
+
+		if (!objectPtr)
+		{
+			objectPtr = glmReadOBJ(path);
+			if (!objectPtr)
+				exit(0);
+
+			glmUnitize(objectPtr);
+			glmFacetNormals(objectPtr);
+			glmVertexNormals(objectPtr, 90.0);
+
+		}
+		return objectPtr;
+	}
+
+
+
 
 	virtual void OnResize(int w, int h)
    {
@@ -244,7 +290,7 @@ public:
      
      // Light model parameters:
      // -------------------------------------------
-     
+     /*
      GLfloat lmKa[] = {0.0, 0.0, 0.0, 0.0 };
      glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmKa);
      
@@ -298,6 +344,7 @@ public:
      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material_Ks);
      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, material_Ke);
      glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material_Se);
+	 */
    }
 };
 
